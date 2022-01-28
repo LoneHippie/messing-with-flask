@@ -64,4 +64,6 @@ def get_drink(id):
             db.session.delete(drink)
             db.session.commit()
             return { 'status': 'success' }
-    
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=5000)
