@@ -1,13 +1,21 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+import os
 
+### Init setups ###
+
+# Init
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
-
+base_dir = os.path.abspath(os.path.dirname(__file__))
+# Configs
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(base_dir, 'data.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Init DB
 db = SQLAlchemy(app)
-
+# Url reference
 base_url = '/api/v1'
 
+# DB Model
 class Drink(db.Model):
     id: int = db.Column(db.Integer, primary_key=True)
     name: str = db.Column(db.String(80), unique=True, nullable=False)
@@ -15,6 +23,8 @@ class Drink(db.Model):
 
     def __repr__(self) -> str:
         return f"{self.name} - {self.description}"
+
+### Routes ###
 
 @app.route('/')
 def index() -> str:
@@ -54,9 +64,9 @@ def get_drink(id) -> dict:
 
     if request.method == 'GET':
         if drink is None:
-            return { 
+            return jsonify({ 
                 'status': 'not found' 
-            }
+            })
         else:
             return jsonify({
                 'name': drink.name,
@@ -73,6 +83,8 @@ def get_drink(id) -> dict:
             return { 
                 'status': 'success'
             }
+
+### Run command ###
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
